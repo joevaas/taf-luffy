@@ -24,6 +24,8 @@ CHANNEL_ID = int(os.environ.get("CHANNEL_ID", "-1002114522672"))
 #OWNER ID
 OWNER_ID = int(os.environ.get("OWNER_ID", "6693549185"))
 
+FILE_AUTO_DELETE = int(os.getenv("FILE_AUTO_DELETE", "600")) # auto delete in seconds
+
 #Port
 PORT = os.environ.get("PORT", "8080")
 
