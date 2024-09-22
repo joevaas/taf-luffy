@@ -90,7 +90,7 @@ async def start_command(client: Client, message: Message):
             except:
                 pass
                 
-        k = await message.reply_text("")
+        k = await message.reply_text("Senpie\n\nThis File Is Going to Kicked By Luffy In 10 Min\n\nPlease Take Action Now")
         await asyncio.sleep(SECONDS)
 
         for snt_msg in snt_msgs:
