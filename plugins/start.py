@@ -16,10 +16,9 @@ from config import ADMINS, FORCE_MSG, START_MSG, CUSTOM_CAPTION, DISABLE_CHANNEL
 from helper_func import subscribed, encode, decode, get_messages
 from database.database import add_user, del_user, full_userbase, present_user
 
-madflixofficials = FILE_AUTO_DELETE
-jishudeveloper = madflixofficials
-file_auto_delete = humanize.naturaldelta(jishudeveloper)
 
+
+SECONDS = int(os.getenv("SECONDS", "1200"))
 
 @Bot.on_message(filters.command('start') & filters.private & subscribed)
 async def start_command(client: Client, message: Message):
@@ -30,7 +29,7 @@ async def start_command(client: Client, message: Message):
         except:
             pass
     text = message.text
-    if len(text)>7:
+    if len(text) > 7:
         try:
             base64_string = text.split(" ", 1)[1]
         except:
@@ -44,7 +43,7 @@ async def start_command(client: Client, message: Message):
             except:
                 return
             if start <= end:
-                ids = range(start,end+1)
+                ids = range(start, end + 1)
             else:
                 ids = []
                 i = start
@@ -57,15 +56,17 @@ async def start_command(client: Client, message: Message):
             try:
                 ids = [int(int(argument[1]) / abs(client.db_channel.id))]
             except:
-                return
-        temp_msg = await message.reply("Please wait...")
+               return
+        temp_msg = await message.reply("Wait A Second...")
         try:
             messages = await get_messages(client, ids)
         except:
             await message.reply_text("Something went wrong..!")
             return
         await temp_msg.delete()
-
+        
+        snt_msgs = []
+        
         for msg in messages:
 
             if bool(CUSTOM_CAPTION) & bool(msg.document):
@@ -79,26 +80,25 @@ async def start_command(client: Client, message: Message):
                 reply_markup = None
 
             try:
-                await msg.copy(chat_id=message.from_user.id, caption = caption, parse_mode = ParseMode.HTML, reply_markup = reply_markup, protect_content=PROTECT_CONTENT)
+                snt_msg = await msg.copy(chat_id=message.from_user.id, caption = caption, parse_mode = ParseMode.HTML, reply_markup = reply_markup, protect_content=PROTECT_CONTENT)
                 await asyncio.sleep(0.5)
+                snt_msgs.append(snt_msg)
             except FloodWait as e:
                 await asyncio.sleep(e.x)
-                await msg.copy(chat_id=message.from_user.id, caption = caption, parse_mode = ParseMode.HTML, reply_markup = reply_markup, protect_content=PROTECT_CONTENT)
+                snt_msg = await msg.copy(chat_id=message.from_user.id, caption = caption, parse_mode = ParseMode.HTML, reply_markup = reply_markup, protect_content=PROTECT_CONTENT)
+                snt_msgs.append(snt_msg)
             except:
                 pass
+                
+        k = await message.reply_text("")
+        await asyncio.sleep(SECONDS)
 
-      k = await client.send_message(chat_id = message.from_user.id, text=f"<b>❗️ <u>IMPORTANT</u> ❗️</b>\n\nThis Video / File Will Be Deleted In {file_auto_delete} (Due To Copyright Issues).\n\n📌 Please Forward This Video / File To Somewhere Else And Start Downloading There.")
-
-        # Schedule the file deletion
-        asyncio.create_task(delete_files(madflix_msgs, client, k))
-        
-         for madflix_msg in madflix_msgs: 
-             try:
-                 await madflix_msg.delete()
-                 await k.edit_text("Your Video / File Is Successfully Deleted ✅") 
-             except:    
-                 pass 
-
+        for snt_msg in snt_msgs:
+            try:
+                await snt_msg.delete()
+                await k.edit_text("Your File/Video Is Successfully Deleted ✅")
+            except:
+                pass
         return
     else:
         reply_markup = InlineKeyboardMarkup(
